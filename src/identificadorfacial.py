@@ -16,30 +16,33 @@ import numpy as np
 
 
 num_classes = 7
-test_data_file = '../data/kaggle-data/fer2013/test.csv'
-train_data_file = '../data/kaggle-data/fer2013/train.csv'
+test_data_file_path = '../data/kaggle-data/fer2013/test.csv'
+train_data_file_path = '../data/kaggle-data/fer2013/train.csv'
 
-emotion_dict= {'Angry': 0, 'Sad': 5, 'Neutral': 4, 'Disgust': 1, 'Surprise': 6, 'Fear': 2, 'Happy': 3}
+emotion_dict= {'Angry': 0, 'Disgust': 1, 'Fear': 2, 'Happy': 3, 'Neutral': 4, 'Sad': 5, 'Surprise': 6}
 
-file = open(train_data_file)
+train_data_file = open(train_data_file)
 
-mylines = file.read().split('\n')
+mylines = train_data_file.read().split('\n')
+#remove cabeçalho
 mylines.pop(0)
+#remove linha em branco do final
+mylines.pop(-1)
 
-tipos=[]
-count=0
-data_vec=[]
+#tipos=[]
+x_train=[]
+y_train=[]
 print (len(mylines))
+
 for line in mylines:
     vec=re.findall(r"[\w']+", line)
-    data_vec.append(vec)
-    if len(vec) < 1:
-        continue
-    if vec[0] not in tipos:
-        tipos.append(line[-1])
+    y_train.append(vec.pop(0))
+    x_train.append(vec)
+    #if len(vec) not in tipos:
+    #    tipos.append(len(vec))
 
-
-print (tipos)
+print (x_train[0])
+print (y_train[0])
 #
 # val_datagen = ImageDataGenerator(rescale=1./255)
 # train_datagen = ImageDataGenerator(
