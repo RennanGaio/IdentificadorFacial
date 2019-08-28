@@ -92,7 +92,7 @@ metrics = [0,""]
 kf = KFold(kn, shuffle=True)
 
 #Classifiers=["SVM", "RF","XGBoost"]
-Classifiers=["XGBoost", "RF", "SVM"]
+Classifiers=["LR","KNN","XGBoost", "RF"]
 
 #this loop will interate for each classifier using diferents kfolds
 for classifier in Classifiers:
@@ -118,7 +118,14 @@ for classifier in Classifiers:
           kernels = [ 'rbf', 'poly', 'sigmoid' ]
           decision_function_shapes = [ 'ovo', 'ovr' ]
           clf = GridSearchCV(estimator=SVC(probability=False), param_grid=dict(kernel=kernels, C=Cs, gamma=Gs, decision_function_shape=decision_function_shapes), scoring="accuracy", n_jobs=-1, cv=5, verbose=0)
-
+        # Linear Regression
+        elif classifier == "LR":
+            Cs = [ 10.0**c for c in range(-2, 3, 1) ]
+            clf = GridSearchCV(estimator=LogisticRegression(solver='lbfgs', multi_class='auto'), param_grid=dict(C=Cs), scoring="accuracy", n_jobs=-1, cv=5, verbose=0)
+        # K Neighbors
+        elif classifier == "KNN":
+            Ks = [ k for k in range(1, 15, 2) ]
+            clf = GridSearchCV(estimator=neighbors.KNeighborsClassifier(), param_grid=dict(n_neighbors=Ks), scoring="accuracy", n_jobs=-1, cv=5, verbose=0)
         #this fit will train your classifier to your dataset
         clf.fit(x_train[train_index],y_train[train_index])
         end = datetime.now()
