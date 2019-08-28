@@ -100,6 +100,9 @@ for classifier in Classifiers:
         print ("Classifier: ",classifier)
         print ("using kfold= ",kn)
         print ("\n")
+        #save time to metrics
+        start = datetime.now()
+
         #this will chose the classifier, and use gridSearch to choose the best hyper parameters focussing on reach the best AUC score
         #random forest
         if classifier == "RF":
@@ -118,6 +121,7 @@ for classifier in Classifiers:
 
         #this fit will train your classifier to your dataset
         clf.fit(x_train[train_index],y_train[train_index])
+        end = datetime.now()
         #this will return the probability of each example be on all classes
         #y_pred = clf.predict_proba(x_train[val_index])
         y_pred = clf.predict(x_train[val_index])
@@ -126,6 +130,7 @@ for classifier in Classifiers:
 
         accuracy = accuracy_score(y_train[val_index], y_pred)
         print ("accuracy: ", str(accuracy))
+        print ("time consuption: " + str(end-start))
         print ("###########################\n")
 
 
