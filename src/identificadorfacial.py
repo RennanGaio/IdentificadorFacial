@@ -117,7 +117,7 @@ for classifier in Classifiers:
           Gs = [ 2.0**g for g in range(3, -15, -2) ]
           kernels = [ 'rbf', 'poly', 'sigmoid' ]
           decision_function_shapes = [ 'ovo', 'ovr' ]
-          clf = GridSearchCV(estimator=SVC(probability=True), param_grid=dict(kernel=kernels, C=Cs, gamma=Gs, decision_function_shape=decision_function_shapes), scoring="roc_auc", n_jobs=-1, cv=5, verbose=0)
+          clf = GridSearchCV(estimator=SVC(probability=False), param_grid=dict(kernel=kernels, C=Cs, gamma=Gs, decision_function_shape=decision_function_shapes), scoring="accuracy", n_jobs=-1, cv=5, verbose=0)
 
         #this fit will train your classifier to your dataset
         clf.fit(x_train[train_index],y_train[train_index])
