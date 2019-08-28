@@ -1,4 +1,5 @@
 from keras.models import load_model
+import pickle
 from keras.preprocessing import image
 import numpy as np
 import os
@@ -30,7 +31,13 @@ def face_detector(img):
     return (x,w,y,h), roi_gray, img
 
 
-classifier = load_model('../models/model_v6_23.hdf5')
+CLASSIFIER="XGB"
+
+if CLASSIFIER=="XGB":
+    classifier = pickle.load(open("../models/pkl_best_model_xgboost.pkl", "rb"))
+else:
+    classifier = load_model('../models/model_v6_23.hdf5')
+
 cap = cv2.VideoCapture(0)
 
 while True:
@@ -39,13 +46,19 @@ while True:
     rect, face, image = face_detector(frame)
     if np.sum([face]) != 0.0:
         roi = face.astype("float") / 255.0
-        roi = img_to_array(roi)
-        roi = np.expand_dims(roi, axis=0)
-
         # make a prediction on the ROI, then lookup the class
-        preds = classifier.predict(roi)[0]
-        print(preds.argmax())
-        label = class_labels[preds.argmax()]
+        if CLASSIFIER=="XGB":
+            roi = roi.reshape((1,-1))
+            #print(roi.shape)
+            preds = classifier.predict(roi)[0]
+            label = class_labels[int(preds)]
+        else:
+            roi = img_to_array(roi)
+            roi = np.expand_dims(roi, axis=0)
+            preds = classifier.predict(roi)[0]
+            label = class_labels[preds.argmax()]
+        #print(preds.argmax())
+
         label_position = (rect[0] + int((rect[1]/2)), rect[2] + 25)
         cv2.putText(image, label, label_position , cv2.FONT_HERSHEY_SIMPLEX,2, (0,255,0), 3)
     else:

@@ -65,7 +65,7 @@ emotion_dict= {'Angry': 0, 'Disgust': 1, 'Fear': 2, 'Happy': 3, 'Neutral': 4, 'S
 x_train, y_train = separate_data(train_data_file_path)
 x_test, y_test = separate_data(test_data_file_path)
 
-#print (x_train[0])
+#print (x_train[0].shape)
 #print (y_train[0])
 #
 # train_datagen = ImageDataGenerator(
