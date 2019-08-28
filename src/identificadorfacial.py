@@ -47,7 +47,9 @@ def separate_data(data_file_path):
     for line in mylines:
         vec=re.findall(r"[\w']+", line)
         y.append(vec.pop(0))
-        x.append(vec)
+        #trocando a escala da imagem de 0 ate 255 para 0 ate 1
+        vec2 = [float(i)/255.0 for i in vec]
+        x.append(vec2)
 
     return np.array(x), np.array(y)
 
@@ -85,10 +87,11 @@ x_test, y_test = separate_data(test_data_file_path)
 
 
 kn=10
-
+metrics = [0,""]
 kf = KFold(kn, shuffle=True)
 
-Classifiers=["SVM", "RF","XGBoost"]
+#Classifiers=["SVM", "RF","XGBoost"]
+Classifiers=["XGBoost", "RF", "SVM"]
 
 #this loop will interate for each classifier using diferents kfolds
 for classifier in Classifiers:
@@ -100,10 +103,10 @@ for classifier in Classifiers:
         #random forest
         if classifier == "RF":
           estimators = [ e for e in range(5, 25, 5) ]
-          clf = GridSearchCV(estimator=RandomForestClassifier(), param_grid=dict(n_estimators=estimators), scoring="roc_auc", n_jobs=-1, cv=5, verbose=0)
+          clf = GridSearchCV(estimator=RandomForestClassifier(), param_grid=dict(n_estimators=estimators), scoring="accuracy", n_jobs=-1, cv=5, verbose=0)
         #XGBoost
         elif classifier == "XGBoost":
-          clf = xgb.XGBClassifier()
+          clf = xgb.XGBClassifier(n_jobs=-1)
         #SVM
         elif classifier == "SVM":
           Cs = [ 2.0**c for c in range(-5, 15, 1) ]
@@ -118,25 +121,23 @@ for classifier in Classifiers:
         #y_pred = clf.predict_proba(x_train[val_index])
         y_pred = clf.predict(x_train[val_index])
 
-        #this will generate the AUC score if i use proba
-        # auc = roc_auc_score(y[val_index], y_pred[:,1])
-        # print "AUC: ", str(auc)
-        # print "###########################\n"
+        #this will generate the accuracy score 
 
         accuracy = accuracy_score(y_train[val_index], y_pred)
         print ("accuracy: ", str(accuracy))
         print ("###########################\n")
 
+
         #this will save the greater value, the estimator (model), the train and test set, to reproduce the best model with the real train set file
         if (classifier!="XGBoost"):
-            if metrics[0]<auc:
+            if metrics[0]<accuracy:
                 metrics=[accuracy, clf, clf.best_estimator_, x_train[train_index], y_train[train_index]]
         else:
-            if metrics[0]<auc:
+            if metrics[0]<accuracy:
                 metrics=[accuracy, clf, "xgboost",x_train[train_index], y_train[train_index]]
 
 #save the best classificator into an file
-pkl_filename = "../models/pkl_best_model_"+metrics[2]+".pkl"
+pkl_filename = "../models/pkl_best_model_"+str(metrics[2])+".pkl"
 with open(pkl_filename, 'wb') as file:
     pickle.dump(metrics[1], file)
 
@@ -156,12 +157,12 @@ test_accuracy = accuracy_score(y_test, test_y_pred)
 print ("best estimator: ", metrics[2])
 print ("greater accuracy in validation: ", metrics[0])
 print("accuracy in test:", test_accuracy)
-file_name="../results/statistics-"+metrics[2]+".txt"
+file_name="../results/statistics-"+str(metrics[2])+".txt"
 with open(file_name, "a+") as f:
     f.write("###################################\n")
     f.write("\nbest estimator: "+ str(metrics[1]))
     f.write("\ngreater accuracy in validation: "+ str(metrics[0]))
-    f.write("\naccuracy in test:", test_accuracy)
+    f.write("\naccuracy in test:"+ str(test_accuracy))
     f.write("\nconjunto de teste: "+ str(metrics[3]))
     f.write("\nconjunto de treino: "+ str(metrics[4]))
     f.write("\n###################################\n")
