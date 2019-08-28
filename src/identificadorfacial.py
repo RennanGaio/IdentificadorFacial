@@ -2,6 +2,7 @@ import os
 import re
 import numpy as np
 import pickle
+from datetime import datetime
 #import pandas as pd
 #import matplotlib.pyplot as plt
 #from PIL import Image
@@ -121,7 +122,7 @@ for classifier in Classifiers:
         #y_pred = clf.predict_proba(x_train[val_index])
         y_pred = clf.predict(x_train[val_index])
 
-        #this will generate the accuracy score 
+        #this will generate the accuracy score
 
         accuracy = accuracy_score(y_train[val_index], y_pred)
         print ("accuracy: ", str(accuracy))
@@ -137,7 +138,7 @@ for classifier in Classifiers:
                 metrics=[accuracy, clf, "xgboost",x_train[train_index], y_train[train_index]]
 
 #save the best classificator into an file
-pkl_filename = "../models/pkl_best_model_"+str(metrics[2])+".pkl"
+pkl_filename = "../models/pkl_best_model_"+str(metrics[2])+"date"+str(datetime.now())+".pkl"
 with open(pkl_filename, 'wb') as file:
     pickle.dump(metrics[1], file)
 
